@@ -46,6 +46,11 @@
         <input type="number" id="discount" min="0" max="100" step="1">
         <button onclick="applyDiscount()">Apply Discount</button>
     </div>
+    <!-- Selected items list -->
+    <div id="selectedItems">
+        <h3>Selected Items:</h3>
+        <ul id="selectedItemsList"></ul>
+    </div>
     <!-- Total -->
     <h3>Total: $<span id="total">0</span></h3>
     <!-- Reset button -->
@@ -79,6 +84,8 @@
         // Add more categories and items as needed
     };
 
+    var selectedItems = {}; // Object to store selected items and their quantities
+
     // Function to display items for a given category
     function showCategory(categoryName) {
         var itemsContainer = document.getElementById('items');
@@ -90,42 +97,66 @@
                 var button = document.createElement('button');
                 button.textContent = item.name + ' ($' + item.price + ')';
                 button.onclick = function() {
-                    addItem(item.name, item.price);
+                    addItem(item);
                 };
                 itemsContainer.appendChild(button);
             });
         }
     }
 
+    // Function to add item to the selected items list
+    function addItem(item) {
+        var itemName = item.name;
+        if (selectedItems[itemName]) {
+            selectedItems[itemName].quantity++;
+        } else {
+            selectedItems[itemName] = { item: item, quantity: 1 };
+        }
+
+        updateSelectedItemsList();
+        updateTotal();
+    }
+
+    // Function to update the selected items list
+    function updateSelectedItemsList() {
+        var selectedItemsList = document.getElementById('selectedItemsList');
+        selectedItemsList.innerHTML = '';
+
+        for (var itemName in selectedItems) {
+            var listItem = document.createElement('li');
+            listItem.textContent = itemName + ' x' + selectedItems[itemName].quantity;
+            selectedItemsList.appendChild(listItem);
+        }
+    }
+
     // Function to add item price to total
-    function addItem(itemName, itemPrice) {
+    function updateTotal() {
         var totalElement = document.getElementById('total');
-        var currentTotal = parseFloat(totalElement.innerText);
-        var newItemPrice = parseFloat(itemPrice);
-        var newTotal = currentTotal + newItemPrice;
-        totalElement.innerText = newTotal.toFixed(2);
-    }
+        var currentTotal = 0;
 
-    // Function to reset total to zero
-    function resetTotal() {
-        var totalElement = document.getElementById('total');
-        totalElement.innerText = '0';
-    }
+        for (var itemName in selectedItems) {
+            var item = selectedItems[itemName].item;
+            var itemPrice = item.price * selectedItems[itemName].quantity;
+            currentTotal += itemPrice;
+        }
 
-    // Function to apply discount
-    function applyDiscount() {
-        var totalElement = document.getElementById('total');
-        var currentTotal = parseFloat(totalElement.innerText);
         var discountInput = document.getElementById('discount');
         var discountPercentage = parseFloat(discountInput.value);
 
         if (!isNaN(discountPercentage) && discountPercentage >= 0 && discountPercentage <= 100) {
             var discountAmount = (currentTotal * discountPercentage) / 100;
-            var discountedTotal = currentTotal - discountAmount;
-            totalElement.innerText = discountedTotal.toFixed(2);
-        } else {
-            alert('Please enter a valid discount percentage between 0 and 100.');
+            currentTotal -= discountAmount;
         }
+
+        totalElement.innerText = currentTotal.toFixed(2);
+    }
+
+    // Function to reset total to zero and clear selected items
+    function resetTotal() {
+        var totalElement = document.getElementById('total');
+        totalElement.innerText = '0';
+        selectedItems = {};
+        updateSelectedItemsList();
     }
 </script>
 
