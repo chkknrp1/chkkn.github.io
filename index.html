@@ -94,7 +94,7 @@
     <!-- Generate Summary button -->
     <button onclick="generateSummary()">Generate Summary</button>
     <!-- Reset button -->
-    <button onclick="resetTotal()">Reset</button>
+    <button onclick="resetAll()">Reset</button>
 </div>
 
 <script>
@@ -228,10 +228,16 @@
         document.getElementById('summary').value = summary;
     }
 
-    // Function to reset total to zero
-    function resetTotal() {
+    // Function to reset total and selected items
+    function resetAll() {
         var totalElement = document.getElementById('total');
         totalElement.innerText = '0';
+
+        selectedItems = {}; // Clear selected items
+        updateSelectedItemsList();
+        document.getElementById('workDone').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('summary').value = '';
     }
 </script>
 
